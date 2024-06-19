@@ -74,7 +74,7 @@
     </div>
 
     <script>
-        const apiKey = 'rp-chrjvp9mE0KY3fqIIEdkIv2laHHYdDOdgEoqYFDs9qUK6FbJ';
+        const apiKey = 'rp-cClnSHPkHZot9XugVtMYbGqThqe5GwA3wIC08VR5oyTpfnZO';
         const messagesContainer = document.getElementById('messages');
         const userInput = document.getElementById('user-input');
 
@@ -85,8 +85,12 @@
             addMessage('user', userMessage);
             userInput.value = '';
 
-            const botMessage = await getBotResponse(userMessage);
-            addMessage('bot', botMessage);
+            try {
+                const botMessage = await getBotResponse(userMessage);
+                addMessage('bot', botMessage);
+            } catch (error) {
+                addMessage('bot', 'Error: ' + error.message);
+            }
         }
 
         function addMessage(sender, text) {
@@ -110,7 +114,15 @@
                 })
             });
 
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+
             const data = await response.json();
+            if (!data.choices || data.choices.length === 0) {
+                throw new Error('No response from the API');
+            }
+
             return data.choices[0].message.content;
         }
     </script>
